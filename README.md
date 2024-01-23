@@ -1,64 +1,36 @@
+// src/app/bold.directive.spec.ts
+
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { Component } from '@angular/core';
+import { Component, DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
-import { HighlightDirective } from './highlight.directive';
+import { BoldDirective } from './bold.directive';
 
 @Component({
-  template: `<div appHighlight [highlightColor]="color">Highlight me!</div>`
+  template: `<div appBold>This is a test</div>`
 })
-class TestComponent {
-  color = 'yellow';
-}
+class TestComponent { }
 
-describe('HighlightDirective', () => {
+describe('BoldDirective', () => {
   let fixture: ComponentFixture<TestComponent>;
-  let component: TestComponent;
+  let des: DebugElement[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [TestComponent, HighlightDirective]
+      declarations: [BoldDirective, TestComponent]
     });
-
     fixture = TestBed.createComponent(TestComponent);
-    component = fixture.componentInstance;
+    fixture.detectChanges();
+    des = fixture.debugElement.queryAll(By.directive(BoldDirective));
   });
 
-  it('should highlight the element on mouseover', () => {
-    fixture.detectChanges();
-
-    const divElement = fixture.debugElement.query(By.css('div')).nativeElement;
-
-    expect(divElement.style.backgroundColor).toBe('');
-
-    divElement.dispatchEvent(new Event('mouseover'));
-
-    expect(divElement.style.backgroundColor).toBe('yellow');
+  it('should create an instance', () => {
+    const directive = new BoldDirective(null, null);
+    expect(directive).toBeTruthy();
   });
 
-  it('should remove highlight on mouseleave', () => {
-    fixture.detectChanges();
-
-    const divElement = fixture.debugElement.query(By.css('div')).nativeElement;
-
-    divElement.style.backgroundColor = 'yellow';
-
-    expect(divElement.style.backgroundColor).toBe('yellow');
-
-    divElement.dispatchEvent(new Event('mouseleave'));
-
-    expect(divElement.style.backgroundColor).toBe('');
-  });
-
-  it('should change highlight color based on input', () => {
-    fixture.detectChanges();
-
-    const divElement = fixture.debugElement.query(By.css('div')).nativeElement;
-
-    expect(divElement.style.backgroundColor).toBe('yellow');
-
-    component.color = 'cyan';
-    fixture.detectChanges();
-
-    expect(divElement.style.backgroundColor).toBe('cyan');
+  it('should apply bold style to the element', () => {
+    expect(des.length).toBe(1);
+    const fontWeight = des[0].nativeElement.style.fontWeight;
+    expect(fontWeight).toBe('bold');
   });
 });
