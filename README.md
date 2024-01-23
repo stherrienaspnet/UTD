@@ -1,22 +1,64 @@
-import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { By } from '@angular/platform-browser';
+import { HighlightDirective } from './highlight.directive';
 
-@Directive({
-  selector: '[appHighlight]'
+@Component({
+  template: `<div appHighlight [highlightColor]="color">Highlight me!</div>`
 })
-export class HighlightDirective {
-  @Input() highlightColor: string = 'yellow';
-
-  constructor(private el: ElementRef, private renderer: Renderer2) {}
-
-  @HostListener('mouseover') onMouseOver() {
-    this.highlight(this.highlightColor);
-  }
-
-  @HostListener('mouseleave') onMouseLeave() {
-    this.highlight(null);
-  }
-
-  private highlight(color: string | null) {
-    this.renderer.setStyle(this.el.nativeElement, 'background-color', color);
-  }
+class TestComponent {
+  color = 'yellow';
 }
+
+describe('HighlightDirective', () => {
+  let fixture: ComponentFixture<TestComponent>;
+  let component: TestComponent;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [TestComponent, HighlightDirective]
+    });
+
+    fixture = TestBed.createComponent(TestComponent);
+    component = fixture.componentInstance;
+  });
+
+  it('should highlight the element on mouseover', () => {
+    fixture.detectChanges();
+
+    const divElement = fixture.debugElement.query(By.css('div')).nativeElement;
+
+    expect(divElement.style.backgroundColor).toBe('');
+
+    divElement.dispatchEvent(new Event('mouseover'));
+
+    expect(divElement.style.backgroundColor).toBe('yellow');
+  });
+
+  it('should remove highlight on mouseleave', () => {
+    fixture.detectChanges();
+
+    const divElement = fixture.debugElement.query(By.css('div')).nativeElement;
+
+    divElement.style.backgroundColor = 'yellow';
+
+    expect(divElement.style.backgroundColor).toBe('yellow');
+
+    divElement.dispatchEvent(new Event('mouseleave'));
+
+    expect(divElement.style.backgroundColor).toBe('');
+  });
+
+  it('should change highlight color based on input', () => {
+    fixture.detectChanges();
+
+    const divElement = fixture.debugElement.query(By.css('div')).nativeElement;
+
+    expect(divElement.style.backgroundColor).toBe('yellow');
+
+    component.color = 'cyan';
+    fixture.detectChanges();
+
+    expect(divElement.style.backgroundColor).toBe('cyan');
+  });
+});
