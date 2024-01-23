@@ -1,36 +1,46 @@
-// src/app/bold.directive.spec.ts
-
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Component, DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
-import { BoldDirective } from './bold.directive';
+import { BackgroundColorDirective } from './background-color.directive';
 
 @Component({
-  template: `<div appBold>This is a test</div>`
+  template: `<div [appBackgroundColor]="color"></div>`
 })
-class TestComponent { }
+class TestComponent {
+  color: string = '';
+}
 
-describe('BoldDirective', () => {
+describe('BackgroundColorDirective', () => {
   let fixture: ComponentFixture<TestComponent>;
-  let des: DebugElement[];
+  let testComponent: TestComponent;
+  let directiveElement: DebugElement;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [BoldDirective, TestComponent]
+      declarations: [BackgroundColorDirective, TestComponent],
     });
+
     fixture = TestBed.createComponent(TestComponent);
+    testComponent = fixture.componentInstance;
+    directiveElement = fixture.debugElement.query(By.directive(BackgroundColorDirective));
+  });
+
+  it('should apply background color to the element', () => {
+    testComponent.color = 'red';
     fixture.detectChanges();
-    des = fixture.debugElement.queryAll(By.directive(BoldDirective));
+
+    expect(directiveElement.styles['background-color']).toBe('red');
   });
 
-  it('should create an instance', () => {
-    const directive = new BoldDirective(null, null);
-    expect(directive).toBeTruthy();
-  });
+  it('should update background color when input changes', () => {
+    testComponent.color = 'blue';
+    fixture.detectChanges();
 
-  it('should apply bold style to the element', () => {
-    expect(des.length).toBe(1);
-    const fontWeight = des[0].nativeElement.style.fontWeight;
-    expect(fontWeight).toBe('bold');
+    expect(directiveElement.styles['background-color']).toBe('blue');
+
+    testComponent.color = 'green';
+    fixture.detectChanges();
+
+    expect(directiveElement.styles['background-color']).toBe('green');
   });
 });
