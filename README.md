@@ -1,46 +1,27 @@
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { Component, DebugElement } from '@angular/core';
-import { By } from '@angular/platform-browser';
-import { BackgroundColorDirective } from './background-color.directive';
+import { Directive, ElementRef, Input, OnChanges } from '@angular/core';
 
-@Component({
-  template: `<div [appBackgroundColor]="color"></div>`
-})
-class TestComponent {
-  color: string = '';
+@Directive({ standalone: true, selector: '[highlight]' })
+/**
+ * Set backgroundColor for the attached element to highlight color
+ * and set the element's customProperty to true
+ */
+export class HighlightDirective implements OnChanges {
+  defaultColor = 'rgb(211, 211, 211)'; // lightgray
+
+  @Input('highlight') bgColor = '';
+
+  constructor(private el: ElementRef) {
+    el.nativeElement.style.customProperty = true;
+  }
+
+  ngOnChanges() {
+    this.el.nativeElement.style.backgroundColor = this.bgColor || this.defaultColor;
+  }
 }
 
-describe('BackgroundColorDirective', () => {
-  let fixture: ComponentFixture<TestComponent>;
-  let testComponent: TestComponent;
-  let directiveElement: DebugElement;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [BackgroundColorDirective, TestComponent],
-    });
-
-    fixture = TestBed.createComponent(TestComponent);
-    testComponent = fixture.componentInstance;
-    directiveElement = fixture.debugElement.query(By.directive(BackgroundColorDirective));
-  });
-
-  it('should apply background color to the element', () => {
-    testComponent.color = 'red';
-    fixture.detectChanges();
-
-    expect(directiveElement.styles['background-color']).toBe('red');
-  });
-
-  it('should update background color when input changes', () => {
-    testComponent.color = 'blue';
-    fixture.detectChanges();
-
-    expect(directiveElement.styles['background-color']).toBe('blue');
-
-    testComponent.color = 'green';
-    fixture.detectChanges();
-
-    expect(directiveElement.styles['background-color']).toBe('green');
-  });
-});
+/*
+Copyright Google LLC. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at https://angular.io/license
+*/
